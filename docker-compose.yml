@@ -5,10 +5,26 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3883:3000"
-    environment:
-      - NODE_ENV=production
+    # Environment files: prefer ENV_FILE if set, then .env.local, then .env
     env_file:
-      - .env.local
+      # This allows users to specify a custom env file via ENV_FILE, or fallback to .env.local, and finally .env
+      - ${ENV_FILE:-.env.local}
+      - .env
+    environment:
+      NODE_ENV: ${NODE_ENV:-production} # No need to tweak this
+
+      # Spotify Configuration
+      SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID}
+      SPOTIFY_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET}
+      SPOTIFY_REDIRECT_URI: ${SPOTIFY_REDIRECT_URI:-http://127.0.0.1:3883/api/auth/callback}
+
+      # Application URL
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://127.0.0.1:3883}
+
+      # Navidrome Configuration (optional - can configure via UI)
+      # NAVIDROME_URL: ${NAVIDROME_URL}
+      # NAVIDROME_USERNAME: ${NAVIDROME_USERNAME}
+      # NAVIDROME_PASSWORD: ${NAVIDROME_PASSWORD}
     restart: unless-stopped
 
   # Optional: Navidrome instance for testing
