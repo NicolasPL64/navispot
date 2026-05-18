@@ -5,11 +5,12 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3883:3000"
-    # Environment files: prefer ENV_FILE if set, then .env.local, then .env
-    env_file:
-      # This allows users to specify a custom env file via ENV_FILE, or fallback to .env.local, and finally .env
-      - ${ENV_FILE:-.env.local}
-      - .env
+    # NOTE: don't use `env_file` for Portainer stacks — Portainer will try to
+    # read listed files on its host and fail if they don't exist. Keep variables
+    # declared below (interpolated with ${VAR}) so they can be provided via:
+    #  - Local CLI: `docker compose --env-file .env.local up` or `ENV_FILE=stack.env docker compose up`
+    #  - Portainer UI: add variables in "Environment variables" when creating the Stack
+    #  - Docker Secrets (recommended for sensitive values)
     environment:
       NODE_ENV: ${NODE_ENV:-production} # No need to tweak this
 
